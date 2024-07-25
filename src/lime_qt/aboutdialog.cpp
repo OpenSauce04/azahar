@@ -7,6 +7,8 @@
 #include "common/scm_rev.h"
 #include "ui_aboutdialog.h"
 
+// This is an epic test comment
+
 AboutDialog::AboutDialog(QWidget* parent)
     : QDialog(parent, Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowSystemMenuHint),
       ui(std::make_unique<Ui::AboutDialog>()) {
