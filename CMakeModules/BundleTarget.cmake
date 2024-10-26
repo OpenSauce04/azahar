@@ -362,7 +362,7 @@ else()
         bundle_target_internal("${target_name}" OFF OFF)
     endfunction()
 
-    # Same as bundle_target, but bundles Qt libraries
+    # Same as bundle_target, but also bundles Qt libraries
     function(qt_bundle_target target_name)
         bundle_target_internal("${target_name}" OFF ON)
     endfunction()
@@ -372,7 +372,7 @@ else()
         bundle_target_internal("${target_name}" ON OFF)
     endfunction()
 
-    # Same as bundle_target, but bundles Qt libraries
+    # Same as bundle_target_in_place, but also bundles Qt libraries
     function(qt_bundle_target_in_place target_name)
         bundle_target_internal("${target_name}" ON ON)
     endfunction()
