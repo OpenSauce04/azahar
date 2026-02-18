@@ -106,7 +106,7 @@ jobs:
           path: ${{ env.BUILD_DIR }}/${{ env.EXTRA_PATH }}/azahar_libretro.dll
   macos:
     if: github.event_name != 'pull_request'
-    runs-on: macos-14
+    runs-on: macos-26
     strategy:
       matrix:
         target: ["x86_64", "arm64"]
@@ -132,7 +132,7 @@ jobs:
           name: ${{ env.OS }}-${{ env.TARGET }}
           path: ${{ env.BUILD_DIR }}/${{ env.EXTRA_PATH }}/azahar_libretro.dylib
   ios:
-    runs-on: macos-14
+    runs-on: macos-26
     env:
       OS: ios
       TARGET: arm64
@@ -154,7 +154,7 @@ jobs:
           path: ${{ env.BUILD_DIR }}/${{ env.EXTRA_PATH }}/azahar_libretro.dylib
   tvos:
     if: github.event_name != 'pull_request'
-    runs-on: macos-14
+    runs-on: macos-26
     env:
       OS: tvos
       TARGET: arm64
