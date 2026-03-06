@@ -458,19 +458,30 @@ bool DspHle::Impl::Tick() {
     return is_on;
 }
 
+static double scaled_ticks_recalc_delay = 100; // Magic number, fresh from my ass
+static s64 scaled_ticks = audio_frame_ticks;
+static int scaled_ticks_recalc_timer = 0; // Will immediately run out on first run
+
 void DspHle::Impl::AudioTickCallback(s64 cycles_late) {
     if (Tick()) {
         // TODO(merry): Signal all the other interrupts as appropriate.
         interrupt_handler(InterruptType::Pipe, DspPipe::Audio);
     }
 
+    if (Settings::values.enable_realtime_audio) {
+        if (++scaled_ticks_recalc_timer >= scaled_ticks_recalc_delay) {
+            auto time_scale = std::max(0.01, // Arbitrary small value to prevent time_scale from approaching zero
+                              Core::System::GetInstance().GetStableFrameTimeScale());
+            scaled_ticks_recalc_delay = 100 * time_scale;
+            scaled_ticks_recalc_timer = 0;
+            scaled_ticks = static_cast<s64>(audio_frame_ticks / time_scale);
+        }
+    } else {
+        scaled_ticks = audio_frame_ticks;
+    }
+
     // Reschedule recurrent event
-    const double time_scale =
-        Settings::values.enable_realtime_audio
-            ? std::max(0.01, // Arbitrary small value to prevent time_scale from approaching zero
-                       Core::System::GetInstance().GetStableFrameTimeScale())
-            : 1.0;
-    s64 adjusted_ticks = static_cast<s64>(audio_frame_ticks / time_scale - cycles_late);
+    s64 adjusted_ticks = scaled_ticks - cycles_late;
     core_timing.ScheduleEvent(adjusted_ticks, tick_event);
 }
 

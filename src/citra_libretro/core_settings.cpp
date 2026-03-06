@@ -51,6 +51,7 @@ static constexpr const char* language_value = citra_setting(BaseKeys::language_v
 namespace audio {
 static constexpr const char* audio_emulation = citra_setting(BaseKeys::audio_emulation);
 static constexpr const char* input_type = citra_setting(BaseKeys::input_type);
+static constexpr const char* enable_realtime_audio = citra_setting(BaseKeys::enable_realtime_audio);
 } // namespace audio
 
 namespace graphics {
@@ -265,6 +266,21 @@ static constexpr retro_core_option_v2_definition option_definitions[] = {
             { "none", "None" },
             { "static_noise", "Static Noise" },
             { "frontend", "Frontend" },
+            { nullptr, nullptr }
+        },
+        "auto"
+    },
+    {
+        config::audio::enable_realtime_audio,
+        "Realtime Audio",
+        "Realtime Audio",
+        "Whether or not playback should account for slowdowns in playback speed. May result in audio desync during cutscenes or similar scenarios.",
+        nullptr,
+        config::category::audio,
+        {
+            { "auto", "Auto" },
+            { config::enabled, "Enabled" },
+            { config::disabled, "Disabled" },
             { nullptr, nullptr }
         },
         "auto"
@@ -822,6 +838,13 @@ static void ParseAudioOptions(void) {
     } else {
         Settings::values.input_type = AudioCore::InputType::Auto;
     }
+
+    auto enable_realtime_audio = LibRetro::FetchVariable(config::audio::enable_realtime_audio, "auto");
+    if (enable_realtime_audio == "auto" || enable_realtime_audio == config::enabled) {
+        Settings::values.enable_realtime_audio = true;
+    } else {
+        Settings::values.enable_realtime_audio = false;
+    }
 }
 
 static Settings::TextureFilter GetTextureFilter(const std::string& name) {
@@ -1005,7 +1028,6 @@ static void ParseInputOptions(void) {
 
 void ParseCoreOptions(void) {
     // Override default values that aren't user-selectable and aren't correct for the core
-    Settings::values.enable_audio_stretching = false;
     Settings::values.frame_limit = 0;
 #if defined(USING_GLES)
     Settings::values.use_gles = true;
