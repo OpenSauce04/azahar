@@ -9,10 +9,12 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.opengl.EGL14
+import android.opengl.EGLConfig
+import android.opengl.GLES20
 import android.os.Build
 import org.citra.citra_emu.utils.DirectoryInitialization
 import org.citra.citra_emu.utils.DocumentsTree
-import org.citra.citra_emu.utils.GpuDriverHelper
 import org.citra.citra_emu.utils.PermissionsHandler
 import org.citra.citra_emu.utils.Log
 import org.citra.citra_emu.utils.MemoryUtil
@@ -69,6 +71,29 @@ class CitraApplication : Application() {
             Log.info("SoC Model - ${Build.SOC_MODEL}")
         }
         Log.info("Total System Memory - ${MemoryUtil.getDeviceRAM()}")
+        val glConfigAttribs = intArrayOf(
+            EGL14.EGL_SURFACE_TYPE, EGL14.EGL_PBUFFER_BIT,
+            EGL14.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT,
+            EGL14.EGL_NONE
+        )
+        val glDisplay = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY)
+        EGL14.eglInitialize(glDisplay, null, 0, null, 1)
+        val glConfigs = arrayOfNulls<EGLConfig>(1)
+        EGL14.eglChooseConfig(glDisplay, glConfigAttribs, 0, glConfigs, 0, 1, IntArray(1), 0)
+        val glConfig = glConfigs[0]!!
+        val glContextAttribs = intArrayOf(EGL14.EGL_CONTEXT_CLIENT_VERSION, 2, EGL14.EGL_NONE)
+        val glContext = EGL14.eglCreateContext(glDisplay, glConfig, EGL14.EGL_NO_CONTEXT, glContextAttribs, 0)
+        val glSurfaceAttribs = intArrayOf(
+            EGL14.EGL_WIDTH, 1,
+            EGL14.EGL_HEIGHT, 1,
+            EGL14.EGL_NONE
+        )
+        val glSurface = EGL14.eglCreatePbufferSurface(glDisplay, glConfig, glSurfaceAttribs, 0)
+        EGL14.eglMakeCurrent(glDisplay, glSurface, glSurface, glContext)
+        Log.info("OpenGL ES Renderer - ${GLES20.glGetString(GLES20.GL_RENDERER)}")
+        EGL14.eglDestroySurface(glDisplay, glSurface)
+        EGL14.eglDestroyContext(glDisplay, glContext)
+        EGL14.eglTerminate(glDisplay)
     }
 
     companion object {
