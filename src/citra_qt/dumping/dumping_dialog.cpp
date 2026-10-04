@@ -2,8 +2,10 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#include <QAbstractItemView>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QScrollBar>
 #include "citra_qt/dumping/dumping_dialog.h"
 #include "citra_qt/dumping/options_dialog.h"
 #include "citra_qt/uisettings.h"
@@ -15,6 +17,40 @@ DumpingDialog::DumpingDialog(QWidget* parent, Core::System& system_)
     : QDialog(parent), ui{std::make_unique<Ui::DumpingDialog>()}, system{system_} {
 
     ui->setupUi(this);
+
+    auto setBetterScrollbar = [](QComboBox* comboBox) {
+        QAbstractItemView* view = comboBox->view();
+        QScrollBar* scrollBar = view->verticalScrollBar();
+
+        scrollBar->setStyleSheet(QStringLiteral(R"(
+            QScrollBar:vertical {
+                background: palette(window);
+                width: 16px;
+                margin: 0px;
+                border-left: 1px solid palette(midlight);
+            }
+            QScrollBar::handle:vertical {
+                background: palette(light);
+                border: none;
+                border-radius: 5px;
+                margin: 2px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: palette(midlight);
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                border: none;
+                height: 0px;
+            }
+            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+                background: none;
+            }
+        )"));
+    };
+
+    setBetterScrollbar(ui->formatComboBox);
+    setBetterScrollbar(ui->videoEncoderComboBox);
+    setBetterScrollbar(ui->audioEncoderComboBox);
 
     format_generic_options = VideoDumper::GetFormatGenericOptions();
     encoder_generic_options = VideoDumper::GetEncoderGenericOptions();
