@@ -117,7 +117,6 @@ libretro-build-ios-arm64:
     - .core-defs
   variables:
     CORE_ARGS: ${BASE_CORE_ARGS} -DCITRA_USE_PRECOMPILED_HEADERS=OFF -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=arm64 -DENABLE_OPT=OFF
-    IOS_MINVER: "14.0"
     EXTRA_PATH: bin/RelWithDebInfo
 
 # tvOS arm64
@@ -127,7 +126,6 @@ libretro-build-tvos-arm64:
     - .core-defs
   variables:
     CORE_ARGS: ${BASE_CORE_ARGS} -DCITRA_USE_PRECOMPILED_HEADERS=OFF -DIOS=ON -DCMAKE_SYSTEM_NAME=tvOS -DCMAKE_OSX_SYSROOT=appletvos -DCMAKE_OSX_ARCHITECTURES=arm64 -DENABLE_OPT=OFF
-    MINVER: "14.0"
     EXTRA_PATH: bin/RelWithDebInfo
 
 ################################### CONSOLES #################################

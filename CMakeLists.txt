@@ -45,23 +45,29 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
 endif()
 
-if (APPLE AND NOT ENABLE_LIBRETRO)
-    # Silence warnings on empty objects, for example when platform-specific code is #ifdef'd out.
-    set(CMAKE_C_ARCHIVE_CREATE "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
-    set(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
-    set(CMAKE_C_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
-    set(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
+if (APPLE)
+    if (NOT ENABLE_LIBRETRO)
+        # Silence warnings on empty objects, for example when platform-specific code is #ifdef'd out.
+        set(CMAKE_C_ARCHIVE_CREATE "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
+        set(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
+        set(CMAKE_C_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
+        set(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
+        if (IOS)
+            # Enable searching CMAKE_PREFIX_PATH for bundled dependencies.
+            set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH)
+            set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
+            set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
+        endif()
+    endif()
 
+    # The minimum platform versions should be greater than or equal to the minimums listed for the
+    # currently used MoltenVK version in this file:
+    # https://github.com/KhronosGroup/MoltenVK/blob/main/MoltenVK/MoltenVK.xcodeproj/project.pbxproj
     if (IOS)
-        # Minimum iOS 14
-        set(CMAKE_OSX_DEPLOYMENT_TARGET "14.0")
-
-        # Enable searching CMAKE_PREFIX_PATH for bundled dependencies.
-        set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH)
-        set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
-        set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
+        # Minimum iOS version
+        set(CMAKE_OSX_DEPLOYMENT_TARGET "15.0")
     else()
-        # Minimum macOS 13
+        # Minimum macOS version
         set(CMAKE_OSX_DEPLOYMENT_TARGET "13.4")
 
         # Catch compiler issue on AppleClang versions below 15.0
