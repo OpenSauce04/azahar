@@ -396,6 +396,14 @@ endif()
 # System imported libraries
 # ======================
 
+# Avoid clashing symbols from static library dependencies
+include(CheckLinkerFlag)
+set(EXCLUDE_LIBS_FLAG "LINKER:--exclude-libs,ALL")
+check_linker_flag(CXX ${EXCLUDE_LIBS_FLAG} HAVE_EXCLUDE_LIBS)
+if (HAVE_EXCLUDE_LIBS)
+    add_link_options(${EXCLUDE_LIBS_FLAG})
+endif()
+
 # Prefer the -pthread flag on Linux.
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)

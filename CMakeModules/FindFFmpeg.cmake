@@ -126,7 +126,7 @@ if (NOT FFMPEG_LIBRARIES)
   # Check if the required components were found and add their stuff to the FFMPEG_* vars.
   foreach (_component ${_FFmpeg_ALL_COMPONENTS})
     if (${_component}_FOUND)
-      set(FFMPEG_LIBRARIES   ${FFMPEG_LIBRARIES}   ${${_component}_LIBRARIES})
+      set(FFMPEG_LIBRARIES   ${FFMPEG_LIBRARIES}   ${${_component}_LIBRARIES} ${PC_${_component}_STATIC_LDFLAGS})
       set(FFMPEG_DEFINITIONS ${FFMPEG_DEFINITIONS} ${${_component}_DEFINITIONS})
       list(APPEND FFMPEG_INCLUDE_DIRS ${${_component}_INCLUDE_DIRS})
     endif ()
